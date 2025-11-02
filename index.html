@@ -179,6 +179,29 @@
             font-size: 16px;
         }
 
+        .validate-btn {
+            padding: 15px 20px;
+            background: #51cf66;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .validate-btn:hover {
+            background: #40c057;
+            transform: scale(1.05);
+        }
+
+        .validate-btn:disabled {
+            background: #a8a8a8;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
         .btn {
             width: 100%;
             padding: 18px;
@@ -593,7 +616,6 @@
                 <div class="input-group">
                     <label>Joueurs (<span id="playerCount">0</span>)</label>
                     <div id="playerList" class="player-list"></div>
-                    <button class="btn btn-secondary" onclick="app.addPlayer()">+ Ajouter un joueur</button>
                 </div>
 
                 <button class="btn btn-primary" onclick="app.startGame()">🚀 Démarrer la partie</button>
@@ -685,6 +707,10 @@
             init() {
                 this.load();
                 this.loadDarkMode();
+                // S'assurer qu'il y a toujours au moins un champ vide
+                if (this.data.state === 'setup' && this.data.players.length === 0) {
+                    this.data.players.push('');
+                }
                 this.render();
             },
 
@@ -735,6 +761,10 @@
 
             removePlayer(index) {
                 this.data.players.splice(index, 1);
+                // S'assurer qu'il reste au moins un champ
+                if (this.data.players.length === 0) {
+                    this.data.players.push('');
+                }
                 this.save();
                 this.renderSetup();
             },
@@ -742,26 +772,58 @@
             updatePlayer(index, name) {
                 this.data.players[index] = name.trim();
                 this.save();
+                this.updatePlayerCount();
+            },
+
+            validatePlayer(index) {
+                const playerName = this.data.players[index].trim();
+
+                // Si le champ est vide, ne rien faire
+                if (!playerName) {
+                    return;
+                }
+
+                // Si c'est le dernier joueur (ou un joueur validé), ajouter un nouveau champ
+                const isLastPlayer = index === this.data.players.length - 1;
+                const hasEmptyField = this.data.players.some(p => !p.trim());
+
+                if (isLastPlayer || !hasEmptyField) {
+                    this.data.players.push('');
+                    this.save();
+                    this.renderSetup();
+
+                    // Focus sur le nouveau champ
+                    setTimeout(() => {
+                        const inputs = document.querySelectorAll('#playerList input');
+                        if (inputs[index + 1]) {
+                            inputs[index + 1].focus();
+                        }
+                    }, 0);
+                }
+            },
+
+            updatePlayerCount() {
+                const validPlayers = this.data.players.filter(p => p.trim()).length;
+                document.getElementById('playerCount').textContent = validPlayers;
             },
 
             startGame() {
-                if (this.data.players.length < 2) {
+                // Filtrer uniquement les joueurs avec des initiales
+                const validPlayers = this.data.players.filter(p => p.trim());
+
+                if (validPlayers.length < 2) {
                     alert('Ajoutez au moins 2 joueurs');
                     return;
                 }
 
-                const emptyPlayers = this.data.players.filter(p => !p.trim());
-                if (emptyPlayers.length > 0) {
-                    alert('Veuillez entrer les initiales de tous les joueurs');
-                    return;
-                }
-
+                // Mettre à jour la liste des joueurs avec seulement les joueurs validés
+                this.data.players = validPlayers;
                 this.data.startCard = document.getElementById('startCard').value;
                 this.data.state = 'playing';
                 this.data.currentRound = 0;
                 this.data.scores = [this.data.players.map(() => 0)];
                 this.data.payMes = [this.data.players.map(() => false)];
-                
+
                 this.save();
                 this.render();
             },
@@ -875,6 +937,10 @@
                 this.data.currentRound = 0;
                 this.data.scores = [];
                 this.data.payMes = [];
+                // S'assurer qu'il y a au moins un champ vide
+                if (this.data.players.length === 0) {
+                    this.data.players.push('');
+                }
                 this.save();
                 this.render();
             },
@@ -899,32 +965,55 @@
 
             renderSetup() {
                 document.getElementById('startCard').value = this.data.startCard;
-                document.getElementById('playerCount').textContent = this.data.players.length;
-                
+                this.updatePlayerCount();
+
                 const list = document.getElementById('playerList');
                 list.innerHTML = '';
-                
+
                 this.data.players.forEach((playerName, i) => {
                     const div = document.createElement('div');
                     div.className = 'player-item';
-                    
+
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.value = playerName;
                     input.placeholder = 'Entrer les initiales';
                     input.maxLength = 10;
-                    
-                    input.onchange = (e) => this.updatePlayer(i, e.target.value);
-                    
+
+                    input.oninput = (e) => {
+                        this.updatePlayer(i, e.target.value);
+                        // Activer/désactiver le bouton de validation
+                        const btn = e.target.nextSibling;
+                        btn.disabled = !e.target.value.trim();
+                    };
+
+                    input.onkeypress = (e) => {
+                        if (e.key === 'Enter' && input.value.trim()) {
+                            this.validatePlayer(i);
+                        }
+                    };
+
                     const btn = document.createElement('button');
-                    btn.className = 'remove-btn';
-                    btn.textContent = '✕';
-                    btn.onclick = () => this.removePlayer(i);
-                    
+                    btn.className = 'validate-btn';
+                    btn.textContent = '✓';
+                    btn.disabled = !playerName.trim();
+                    btn.onclick = () => this.validatePlayer(i);
+
                     div.appendChild(input);
                     div.appendChild(btn);
                     list.appendChild(div);
                 });
+
+                // Focus sur le premier champ vide
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll('#playerList input');
+                    for (let input of inputs) {
+                        if (!input.value.trim()) {
+                            input.focus();
+                            break;
+                        }
+                    }
+                }, 0);
             },
 
             renderGame() {
