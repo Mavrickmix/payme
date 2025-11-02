@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Me</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Configuration */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .player-list {
+            margin: 15px 0;
+        }
+
+        .player-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .player-item input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .player-item input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .remove-btn {
+            padding: 15px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+
+        /* Jeu */
+        .card-info {
+            text-align: center;
+            margin: 20px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .card-value {
+            font-size: 70px;
+            font-weight: bold;
+        }
+
+        .card-label {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            position: sticky;
+            top: 0;
+        }
+
+        th:first-child {
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        th.winner-col {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+        }
+
+        td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        td:first-child {
+            text-align: left;
+            padding-left: 15px;
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        tr.total-row td {
+            background: #fff9e6;
+            font-weight: bold;
+            font-size: 22px;
+            color: #11998e;
+            border-bottom: 3px solid #11998e;
+        }
+
+        tr.total-row td.winner-total {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+        }
+
+        tr.current td {
+            background: #e8faf6;
+        }
+
+        .score-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input.score-input {
+            width: 70px;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        input.score-input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .payme-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .payme-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #11998e;
+        }
+
+        .payme-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .payme-badge {
+            display: inline-block;
+            background: #11998e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        .payme-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .round-badge {
+            display: inline-block;
+            background: #11998e;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+
+        /* Écran de pointage */
+        .ranking-table {
+            margin: 20px 0;
+        }
+
+        .ranking-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .ranking-header h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ranking-item.first {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-color: #ffc107;
+        }
+
+        .ranking-item.second {
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+            border-color: #c0c0c0;
+        }
+
+        .ranking-item.third {
+            background: linear-gradient(135deg, #f4a460 0%, #daa520 100%);
+            border-color: #cd853f;
+        }
+
+        .ranking-position {
+            font-size: 32px;
+            font-weight: bold;
+            width: 70px;
+            text-align: center;
+        }
+
+        .ranking-name {
+            flex: 1;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .ranking-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: #11998e;
+            margin-right: 10px;
+        }
+
+        .ranking-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* Fin */
+        .winner-banner {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .winner-banner h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .winner-banner p {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .card-value {
+                font-size: 50px;
+            }
+            
+            th, td {
+                padding: 10px 5px;
+                font-size: 14px;
+            }
+            
+            input.score-input {
+                width: 55px;
+                font-size: 18px;
+            }
+
+            .ranking-position {
+                font-size: 24px;
+                width: 50px;
+            }
+
+            .ranking-name {
+                font-size: 18px;
+            }
+
+            .ranking-score {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 PAY ME 💰</h1>
+        </div>
+        <div class="content">
+            
+            <!-- Configuration -->
+            <div id="setupScreen" class="screen active">
+                <div class="input-group">
+                    <label>Carte de départ</label>
+                    <select id="startCard">
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="V">Valet</option>
+                        <option value="D">Dame</option>
+                        <option value="R">Roi</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Joueurs (<span id="playerCount">0</span>)</label>
+                    <div id="playerList" class="player-list"></div>
+                    <button class="btn btn-secondary" onclick="app.addPlayer()">+ Ajouter un joueur</button>
+                </div>
+
+                <button class="btn btn-primary" onclick="app.startGame()">🚀 Démarrer la partie</button>
+            </div>
+
+            <!-- Jeu -->
+            <div id="gameScreen" class="screen">
+                <div class="card-info">
+                    <div class="card-value" id="currentCard"></div>
+                    <div class="card-label">Manche <span id="currentRound"></span></div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="gameTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-primary" onclick="app.nextRound()">➡️ Manche suivante</button>
+                <button class="btn btn-info" onclick="app.showRanking()">📊 Voir pointage</button>
+                <button class="btn btn-danger" onclick="app.showResetModal()">🔄 Réinitialiser</button>
+            </div>
+
+            <!-- Pointage -->
+            <div id="rankingScreen" class="screen">
+                <div class="ranking-header">
+                    <h2>📊 Classement</h2>
+                    <p>Ordre des joueurs par points</p>
+                </div>
+
+                <div id="rankingList" class="ranking-table"></div>
+
+                <button class="btn btn-primary" onclick="app.backToGame()">↩️ Revenir à la partie</button>
+            </div>
+
+            <!-- Fin -->
+            <div id="endScreen" class="screen">
+                <div class="winner-banner">
+                    <h2>🏆 Partie terminée ! 🏆</h2>
+                    <p id="winnerText"></p>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="finalTable">
+                        <thead id="finalTableHead"></thead>
+                        <tbody id="finalTableBody"></tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-primary" onclick="app.newGame()">🎮 Nouvelle partie</button>
+                <button class="btn btn-danger" onclick="app.showResetModal()">🔄 Tout réinitialiser</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal de réinitialisation -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ Êtes-vous certain de vouloir terminer cette partie ?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" onclick="app.restartWithSamePlayers()">
+                    🔄 Rejouer avec les mêmes joueurs
+                </button>
+                <button class="modal-btn modal-btn-secondary" onclick="app.completeReset()">
+                    🆕 Nouvelle partie complète
+                </button>
+                <button class="modal-btn modal-btn-cancel" onclick="app.closeResetModal()">
+                    ✕ Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CARDS = ['3', '4', '5', '6', '7', '8', '9', '10', 'V', 'D', 'R'];
+
+        const app = {
+            data: {
+                state: 'setup',
+                players: [],
+                startCard: '3',
+                currentRound: 0,
+                scores: [],
+                payMes: [] // Nouveau: tableau pour suivre les Pay Me [roundIndex][playerIndex] = boolean
+            },
+
+            init() {
+                this.load();
+                this.render();
+            },
+
+            load() {
+                const saved = localStorage.getItem('payme-data');
+                if (saved) {
+                    try {
+                        this.data = JSON.parse(saved);
+                        // Initialiser payMes si absent (compatibilité)
+                        if (!this.data.payMes) {
+                            this.data.payMes = this.data.scores.map(round => round.map(() => false));
+                        }
+                    } catch (e) {
+                        console.error('Erreur chargement:', e);
+                    }
+                }
+            },
+
+            save() {
+                localStorage.setItem('payme-data', JSON.stringify(this.data));
+            },
+
+            getInitials(name) {
+                const clean = name.trim().replace(/\s+/g, '');
+                return clean.substring(0, 3).toUpperCase() || 'XXX';
+            },
+
+            addPlayer() {
+                this.data.players.push('');
+                this.save();
+                this.renderSetup();
+            },
+
+            removePlayer(index) {
+                this.data.players.splice(index, 1);
+                this.save();
+                this.renderSetup();
+            },
+
+            updatePlayer(index, name) {
+                this.data.players[index] = name.trim();
+                this.save();
+            },
+
+            startGame() {
+                if (this.data.players.length < 2) {
+                    alert('Ajoutez au moins 2 joueurs');
+                    return;
+                }
+
+                const emptyPlayers = this.data.players.filter(p => !p.trim());
+                if (emptyPlayers.length > 0) {
+                    alert('Veuillez entrer les initiales de tous les joueurs');
+                    return;
+                }
+
+                this.data.startCard = document.getElementById('startCard').value;
+                this.data.state = 'playing';
+                this.data.currentRound = 0;
+                this.data.scores = [this.data.players.map(() => 0)];
+                this.data.payMes = [this.data.players.map(() => false)];
+                
+                this.save();
+                this.render();
+            },
+
+            updateScore(round, player, value) {
+                this.data.scores[round][player] = parseInt(value) || 0;
+                this.save();
+                this.updateTotals();
+            },
+
+            updatePayMe(round, player, checked) {
+                this.data.payMes[round][player] = checked;
+                this.save();
+            },
+
+            updateTotals() {
+                const totalCells = document.querySelectorAll('.total-row td');
+                for (let i = 1; i < totalCells.length; i++) {
+                    const playerIndex = i - 1;
+                    const total = this.getTotal(playerIndex);
+                    const payMeCount = this.getPayMeCount(playerIndex);
+                    totalCells[i].innerHTML = `${total}<div class="payme-count">${payMeCount} Pay Me</div>`;
+                }
+            },
+
+            getTotal(playerIndex) {
+                let sum = 0;
+                this.data.scores.forEach(round => {
+                    sum += round[playerIndex] || 0;
+                });
+                return sum;
+            },
+
+            getPayMeCount(playerIndex) {
+                let count = 0;
+                this.data.payMes.forEach(round => {
+                    if (round[playerIndex]) count++;
+                });
+                return count;
+            },
+
+            getRoundScores(playerIndex) {
+                return this.data.scores.map(round => round[playerIndex] || 0);
+            },
+
+            nextRound() {
+                const startIndex = CARDS.indexOf(this.data.startCard);
+                this.data.currentRound++;
+                
+                if (startIndex + this.data.currentRound >= CARDS.length) {
+                    this.endGame();
+                    return;
+                }
+
+                this.data.scores.push(this.data.players.map(() => 0));
+                this.data.payMes.push(this.data.players.map(() => false));
+                this.save();
+                this.renderGame();
+            },
+
+            showRanking() {
+                this.data.state = 'ranking';
+                this.render();
+            },
+
+            backToGame() {
+                this.data.state = 'playing';
+                this.render();
+            },
+
+            showResetModal() {
+                document.getElementById('resetModal').classList.add('active');
+            },
+
+            closeResetModal() {
+                document.getElementById('resetModal').classList.remove('active');
+            },
+
+            restartWithSamePlayers() {
+                this.closeResetModal();
+                this.data.state = 'playing';
+                this.data.currentRound = 0;
+                this.data.scores = [this.data.players.map(() => 0)];
+                this.data.payMes = [this.data.players.map(() => false)];
+                this.save();
+                this.render();
+            },
+
+            completeReset() {
+                this.closeResetModal();
+                this.data = {
+                    state: 'setup',
+                    players: [],
+                    startCard: '3',
+                    currentRound: 0,
+                    scores: [],
+                    payMes: []
+                };
+                localStorage.removeItem('payme-data');
+                this.render();
+            },
+
+            endGame() {
+                this.data.state = 'finished';
+                this.save();
+                this.render();
+            },
+
+            newGame() {
+                this.data.state = 'setup';
+                this.data.currentRound = 0;
+                this.data.scores = [];
+                this.data.payMes = [];
+                this.save();
+                this.render();
+            },
+
+            render() {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                
+                if (this.data.state === 'setup') {
+                    this.renderSetup();
+                    document.getElementById('setupScreen').classList.add('active');
+                } else if (this.data.state === 'playing') {
+                    this.renderGame();
+                    document.getElementById('gameScreen').classList.add('active');
+                } else if (this.data.state === 'ranking') {
+                    this.renderRanking();
+                    document.getElementById('rankingScreen').classList.add('active');
+                } else {
+                    this.renderEnd();
+                    document.getElementById('endScreen').classList.add('active');
+                }
+            },
+
+            renderSetup() {
+                document.getElementById('startCard').value = this.data.startCard;
+                document.getElementById('playerCount').textContent = this.data.players.length;
+                
+                const list = document.getElementById('playerList');
+                list.innerHTML = '';
+                
+                this.data.players.forEach((playerName, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'player-item';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = playerName;
+                    input.placeholder = 'Entrer les initiales';
+                    input.maxLength = 10;
+                    
+                    input.onchange = (e) => this.updatePlayer(i, e.target.value);
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'remove-btn';
+                    btn.textContent = '✕';
+                    btn.onclick = () => this.removePlayer(i);
+                    
+                    div.appendChild(input);
+                    div.appendChild(btn);
+                    list.appendChild(div);
+                });
+            },
+
+            renderGame() {
+                const startIndex = CARDS.indexOf(this.data.startCard);
+                const currentCard = CARDS[startIndex + this.data.currentRound];
+                
+                document.getElementById('currentCard').textContent = currentCard;
+                document.getElementById('currentRound').textContent = this.data.currentRound + 1;
+
+                const thead = document.getElementById('tableHead');
+                thead.innerHTML = '';
+                const headerRow = document.createElement('tr');
+                
+                const th1 = document.createElement('th');
+                th1.textContent = 'Manche';
+                headerRow.appendChild(th1);
+                
+                this.data.players.forEach(playerName => {
+                    const th = document.createElement('th');
+                    th.textContent = this.getInitials(playerName);
+                    th.title = playerName;
+                    headerRow.appendChild(th);
+                });
+                
+                thead.appendChild(headerRow);
+
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '';
+
+                const totalRow = document.createElement('tr');
+                totalRow.className = 'total-row';
+                
+                const td1 = document.createElement('td');
+                td1.textContent = 'TOTAL';
+                totalRow.appendChild(td1);
+                
+                this.data.players.forEach((_, i) => {
+                    const td = document.createElement('td');
+                    const total = this.getTotal(i);
+                    const payMeCount = this.getPayMeCount(i);
+                    td.innerHTML = `${total}<div class="payme-count">${payMeCount} Pay Me</div>`;
+                    totalRow.appendChild(td);
+                });
+                
+                tbody.appendChild(totalRow);
+
+                this.data.scores.forEach((round, roundIndex) => {
+                    const tr = document.createElement('tr');
+                    if (roundIndex === this.data.currentRound) {
+                        tr.className = 'current';
+                    }
+
+                    const tdRound = document.createElement('td');
+                    const card = CARDS[startIndex + roundIndex];
+                    tdRound.innerHTML = `<span class="round-badge">${roundIndex + 1}</span>${card}`;
+                    tr.appendChild(tdRound);
+
+                    round.forEach((score, playerIndex) => {
+                        const td = document.createElement('td');
+                        
+                        if (roundIndex === this.data.currentRound) {
+                            const scoreCell = document.createElement('div');
+                            scoreCell.className = 'score-cell';
+                            
+                            const input = document.createElement('input');
+                            input.type = 'number';
+                            input.className = 'score-input';
+                            input.value = score;
+                            input.min = '0';
+                            input.inputMode = 'numeric';
+                            
+                            input.onfocus = function() {
+                                if (this.value === '0') {
+                                    this.value = '';
+                                }
+                            };
+                            
+                            input.onblur = function() {
+                                if (this.value === '') {
+                                    this.value = '0';
+                                }
+                            };
+                            
+                            input.onchange = (e) => this.updateScore(roundIndex, playerIndex, e.target.value);
+                            
+                            const checkWrapper = document.createElement('div');
+                            checkWrapper.className = 'payme-checkbox-wrapper';
+                            
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.className = 'payme-checkbox';
+                            checkbox.checked = this.data.payMes[roundIndex][playerIndex];
+                            checkbox.onchange = (e) => this.updatePayMe(roundIndex, playerIndex, e.target.checked);
+                            
+                            const checkLabel = document.createElement('span');
+                            checkLabel.className = 'payme-label';
+                            checkLabel.textContent = 'Pay Me';
+                            
+                            checkWrapper.appendChild(checkbox);
+                            checkWrapper.appendChild(checkLabel);
+                            
+                            scoreCell.appendChild(input);
+                            scoreCell.appendChild(checkWrapper);
+                            td.appendChild(scoreCell);
+                        } else {
+                            const hasPayMe = this.data.payMes[roundIndex][playerIndex];
+                            td.innerHTML = score + (hasPayMe ? '<span class="payme-badge">💰</span>' : '');
+                        }
+                        
+                        tr.appendChild(td);
+                    });
+
+                    tbody.appendChild(tr);
+                });
+            },
+
+            renderRanking() {
+                const rankings = this.data.players.map((playerName, i) => ({
+                    name: playerName,
+                    total: this.getTotal(i),
+                    payMeCount: this.getPayMeCount(i),
+                    rounds: this.getRoundScores(i)
+                }));
+                
+                rankings.sort((a, b) => a.total - b.total);
+
+                const list = document.getElementById('rankingList');
+                list.innerHTML = '';
+
+                rankings.forEach((player, index) => {
+                    const div = document.createElement('div');
+                    let className = 'ranking-item';
+                    if (index === 0) className += ' first';
+                    else if (index === 1) className += ' second';
+                    else if (index === 2) className += ' third';
+                    div.className = className;
+
+                    let position = '';
+                    if (index === 0) position = '🥇';
+                    else if (index === 1) position = '🥈';
+                    else if (index === 2) position = '🥉';
+                    else position = (index + 1).toString();
+
+                    const roundsDetail = player.rounds.map((s, i) => `M${i+1}:${s}`).join(' • ');
+
+                    div.innerHTML = `
+                        <div class="ranking-position">${position}</div>
+                        <div style="flex: 1;">
+                            <div class="ranking-name">${player.name}</div>
+                            <div class="ranking-details">${roundsDetail}</div>
+                            <div class="ranking-details">💰 ${player.payMeCount} Pay Me</div>
+                        </div>
+                        <div class="ranking-score">${player.total}</div>
+                    `;
+                    list.appendChild(div);
+                });
+            },
+
+            renderEnd() {
+                const playerRankings = this.data.players.map((playerName, i) => ({
+                    name: playerName,
+                    index: i,
+                    total: this.getTotal(i),
+                    payMeCount: this.getPayMeCount(i)
+                }));
+                
+                playerRankings.sort((a, b) => a.total - b.total);
+
+                document.getElementById('winnerText').innerHTML = 
+                    `🥇 Gagnant : <strong>${playerRankings[0].name}</strong> avec <strong>${playerRankings[0].total}</strong> points`;
+
+                const startIndex = CARDS.indexOf(this.data.startCard);
+                
+                const thead = document.getElementById('finalTableHead');
+                thead.innerHTML = '';
+                const headerRow = document.createElement('tr');
+                
+                const th1 = document.createElement('th');
+                th1.textContent = 'Manche';
+                headerRow.appendChild(th1);
+                
+                playerRankings.forEach((player, rank) => {
+                    const th = document.createElement('th');
+                    if (rank === 0) {
+                        th.className = 'winner-col';
+                    }
+                    th.textContent = this.getInitials(player.name);
+                    th.title = player.name;
+                    headerRow.appendChild(th);
+                });
+                
+                thead.appendChild(headerRow);
+
+                const tbody = document.getElementById('finalTableBody');
+                tbody.innerHTML = '';
+
+                const totalRow = document.createElement('tr');
+                totalRow.className = 'total-row';
+                
+                const tdTotal = document.createElement('td');
+                tdTotal.textContent = 'TOTAL';
+                totalRow.appendChild(tdTotal);
+                
+                playerRankings.forEach((player, rank) => {
+                    const td = document.createElement('td');
+                    if (rank === 0) {
+                        td.className = 'winner-total';
+                    }
+                    td.innerHTML = `${player.total}<div class="payme-count">${player.payMeCount} Pay Me</div>`;
+                    totalRow.appendChild(td);
+                });
+                
+                tbody.appendChild(totalRow);
+
+                this.data.scores.forEach((round, roundIndex) => {
+                    const tr = document.createElement('tr');
+
+                    const tdRound = document.createElement('td');
+                    const card = CARDS[startIndex + roundIndex];
+                    tdRound.innerHTML = `<span class="round-badge">${roundIndex + 1}</span>${card}`;
+                    tr.appendChild(tdRound);
+
+                    playerRankings.forEach((player) => {
+                        const td = document.createElement('td');
+                        const score = round[player.index];
+                        const hasPayMe = this.data.payMes[roundIndex][player.index];
+                        td.innerHTML = score + (hasPayMe ? '<span class="payme-badge">💰</span>' : '');
+                        tr.appendChild(td);
+                    });
+
+                    tbody.appendChild(tr);
+                });
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
