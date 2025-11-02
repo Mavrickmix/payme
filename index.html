@@ -5,6 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pay Me</title>
     <style>
+        :root {
+            --bg-gradient-start: #1e3c72;
+            --bg-gradient-end: #2a5298;
+            --container-bg: white;
+            --header-gradient-start: #11998e;
+            --header-gradient-end: #38ef7d;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-tertiary: #666;
+            --border-color: #e0e0e0;
+            --input-bg: white;
+            --table-bg: white;
+            --table-row-odd: #f8f9fa;
+            --table-row-current: #e8faf6;
+            --table-border: #f0f0f0;
+            --total-row-bg: #fff9e6;
+            --card-info-bg-start: #1e3c72;
+            --card-info-bg-end: #2a5298;
+            --modal-bg: white;
+            --shadow-color: rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f1419;
+            --bg-gradient-end: #1a1f2e;
+            --container-bg: #1e2530;
+            --header-gradient-start: #0d7a6f;
+            --header-gradient-end: #2bc97d;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b8b8b8;
+            --text-tertiary: #a0a0a0;
+            --border-color: #3a4556;
+            --input-bg: #2a3441;
+            --table-bg: #1e2530;
+            --table-row-odd: #252d3a;
+            --table-row-current: #1a3a34;
+            --table-border: #3a4556;
+            --total-row-bg: #2d2819;
+            --card-info-bg-start: #0f1419;
+            --card-info-bg-end: #1a1f2e;
+            --modal-bg: #1e2530;
+            --shadow-color: rgba(0,0,0,0.6);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,25 +57,47 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
             padding: 10px;
+            transition: background 0.3s ease;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
+            background: var(--container-bg);
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px var(--shadow-color);
             overflow: hidden;
+            transition: background 0.3s ease;
         }
 
         .header {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
             padding: 20px;
             text-align: center;
             color: white;
+            position: relative;
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
         }
 
         .header h1 {
@@ -61,16 +127,19 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-secondary);
             font-size: 16px;
         }
 
         select {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         .player-list {
@@ -86,14 +155,17 @@
         .player-item input {
             flex: 1;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         .player-item input:focus {
             outline: none;
-            border-color: #11998e;
+            border-color: var(--header-gradient-start);
         }
 
         .remove-btn {
@@ -125,8 +197,8 @@
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #666;
+            background: var(--border-color);
+            color: var(--text-tertiary);
         }
 
         .btn-info {
@@ -144,7 +216,7 @@
             text-align: center;
             margin: 20px 0;
             padding: 30px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, var(--card-info-bg-start) 0%, var(--card-info-bg-end) 100%);
             border-radius: 15px;
             color: white;
         }
@@ -169,11 +241,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: var(--table-bg);
+            transition: all 0.3s ease;
         }
 
         th {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
             color: white;
             padding: 15px 8px;
             font-size: 16px;
@@ -196,22 +269,24 @@
         td {
             padding: 12px 8px;
             text-align: center;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--table-border);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         td:first-child {
             text-align: left;
             padding-left: 15px;
             font-weight: 600;
-            background: #f8f9fa;
+            background: var(--table-row-odd);
         }
 
         tr.total-row td {
-            background: #fff9e6;
+            background: var(--total-row-bg);
             font-weight: bold;
             font-size: 22px;
-            color: #11998e;
-            border-bottom: 3px solid #11998e;
+            color: var(--header-gradient-start);
+            border-bottom: 3px solid var(--header-gradient-start);
         }
 
         tr.total-row td.winner-total {
@@ -220,7 +295,7 @@
         }
 
         tr.current td {
-            background: #e8faf6;
+            background: var(--table-row-current);
         }
 
         .score-cell {
@@ -236,13 +311,16 @@
             text-align: center;
             font-size: 20px;
             font-weight: bold;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         input.score-input:focus {
             outline: none;
-            border-color: #11998e;
+            border-color: var(--header-gradient-start);
         }
 
         .payme-checkbox-wrapper {
@@ -256,18 +334,18 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: #11998e;
+            accent-color: var(--header-gradient-start);
         }
 
         .payme-label {
             font-size: 11px;
-            color: #666;
+            color: var(--text-tertiary);
             font-weight: 600;
         }
 
         .payme-badge {
             display: inline-block;
-            background: #11998e;
+            background: var(--header-gradient-start);
             color: white;
             padding: 2px 8px;
             border-radius: 10px;
@@ -277,13 +355,13 @@
 
         .payme-count {
             font-size: 12px;
-            color: #666;
+            color: var(--text-tertiary);
             margin-top: 3px;
         }
 
         .round-badge {
             display: inline-block;
-            background: #11998e;
+            background: var(--header-gradient-start);
             color: white;
             padding: 5px 12px;
             border-radius: 15px;
@@ -297,7 +375,7 @@
         }
 
         .ranking-header {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -314,8 +392,8 @@
             display: flex;
             align-items: center;
             padding: 15px;
-            background: white;
-            border: 2px solid #f0f0f0;
+            background: var(--container-bg);
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             margin-bottom: 10px;
         }
@@ -340,24 +418,26 @@
             font-weight: bold;
             width: 70px;
             text-align: center;
+            color: var(--text-primary);
         }
 
         .ranking-name {
             flex: 1;
             font-size: 24px;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .ranking-score {
             font-size: 32px;
             font-weight: bold;
-            color: #11998e;
+            color: var(--header-gradient-start);
             margin-right: 10px;
         }
 
         .ranking-details {
             font-size: 14px;
-            color: #666;
+            color: var(--text-tertiary);
             margin-top: 5px;
         }
 
@@ -381,18 +461,19 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--modal-bg);
             border-radius: 15px;
             padding: 30px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px var(--shadow-color);
+            transition: all 0.3s ease;
         }
 
         .modal-title {
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 20px;
             text-align: center;
         }
@@ -423,8 +504,8 @@
         }
 
         .modal-btn-cancel {
-            background: #f0f0f0;
-            color: #666;
+            background: var(--border-color);
+            color: var(--text-tertiary);
         }
 
         /* Fin */
@@ -484,6 +565,9 @@
     <div class="container">
         <div class="header">
             <h1>💰 PAY ME 💰</h1>
+            <button class="dark-mode-toggle" onclick="app.toggleDarkMode()" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
         </div>
         <div class="content">
             
@@ -600,7 +684,23 @@
 
             init() {
                 this.load();
+                this.loadDarkMode();
                 this.render();
+            },
+
+            loadDarkMode() {
+                const isDarkMode = localStorage.getItem('darkMode') === 'true';
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('themeIcon').textContent = '☀️';
+                }
+            },
+
+            toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDarkMode);
+                document.getElementById('themeIcon').textContent = isDarkMode ? '☀️' : '🌙';
             },
 
             load() {
